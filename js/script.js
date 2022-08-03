@@ -1,6 +1,8 @@
 // selects overview class - profile info will appear here
 let overview = document.querySelector(".overview");
 let repoList = document.querySelector(".repo-list");
+let allRepos = document.querySelector(".repos");
+let repoData = document.querySelector(".repo-data");
 
 let username = "camigm1";
 
@@ -41,7 +43,48 @@ const displayRepos = function (repos) {
   repos.forEach((repo) => {
     let li = document.createElement("li");
     li.classList.add("repo");
-    li.innerHTML = `${repo.name}`;
+    li.innerHTML = `<h3>${repo.name}</h3>`;
     repoList.append(li);
   });
 };
+
+repoList.addEventListener("click", function (e) {
+  if (e.target.matches("h3")) {
+    let repoName = e.target.innerText;
+    getRepoInfo(repoName);
+    console.log(repoName); // not showing name on console?
+  }
+});
+
+const getRepoInfo = async function (repoName) {
+  let req = await fetch(`https://api.github.com/repos/${username}/${repoName}`);
+  let repoInfo = await req.json();
+  console.log(repoInfo);
+  let fetchLanguages = await fetch(repoInfo.languages_url);
+  let languageData = await fetchLanguages.json();
+  console.log(languageData);
+  const languages = [];
+  for (let value in languageData) {
+    languages.push(value);
+    console.log(languages);
+  }
+  displayRepoInfo(repoInfo, languages);
+};
+
+const displayRepoInfo = function (repoInfo, languages) {
+  repoData.innerHTML = "";
+  let div = document.createElement("div");
+  div.innerHTML = `<h3>Name: ${repoInfo.name}</h3>
+  <p>Description: ${repoInfo.description}</p>
+  <p>Default Branch: ${repoInfo.default_branch}</p>
+  <p>Languages: ${languages.join(", ")}</p>
+  <a class="visit" href="${
+    repoInfo.html_url
+  }" target="_blank" rel="noreferrer noopener">View Repo on GitHub!</a>`;
+  repoData.classList.remove("hide");
+  repoData.append(div); // says it's not a function
+  repoData.classList.remove("hide");
+  allRepos.classList.add("hide");
+};
+
+getRepoInfo();
