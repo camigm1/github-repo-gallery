@@ -3,6 +3,8 @@ let overview = document.querySelector(".overview");
 let repoList = document.querySelector(".repo-list");
 let allRepos = document.querySelector(".repos");
 let repoData = document.querySelector(".repo-data");
+let backToRepos = document.querySelector(".view-repos");
+let filterInput = document.querySelector(".filter-repos");
 
 let username = "camigm1";
 
@@ -40,6 +42,7 @@ const getRepos = async function () {
 };
 
 const displayRepos = function (repos) {
+  filterInput.classList.remove("hide");
   repos.forEach((repo) => {
     let li = document.createElement("li");
     li.classList.add("repo");
@@ -73,6 +76,7 @@ const getRepoInfo = async function (repoName) {
 
 const displayRepoInfo = function (repoInfo, languages) {
   repoData.innerHTML = "";
+
   let div = document.createElement("div");
   div.innerHTML = `<h3>Name: ${repoInfo.name}</h3>
   <p>Description: ${repoInfo.description}</p>
@@ -85,6 +89,28 @@ const displayRepoInfo = function (repoInfo, languages) {
   repoData.append(div); // says it's not a function
   repoData.classList.remove("hide");
   allRepos.classList.add("hide");
+  backToRepos.classList.remove("hide");
 };
 
 getRepoInfo();
+
+backToRepos.addEventListener("click", function () {
+  allRepos.classList.remove("hide");
+  repoData.classList.add("hide");
+  backToRepos.classList.add("hide");
+});
+
+filterInput.addEventListener("input", function (e) {
+  let searchValue = e.target.value;
+  console.log(searchValue);
+  let repos = document.querySelectorAll(".repo");
+  let valueLowerCase = searchValue.toLowerCase();
+  for (const repo of repos) {
+    let repoName = repo.innerText.toLowerCase();
+    if (repoName.includes(valueLowerCase)) {
+      repo.classList.remove("hide");
+    } else {
+      repo.classList.add("hide");
+    }
+  }
+});
